@@ -2,6 +2,7 @@ import 'dart:js_util';
 import 'package:dart_test/kata.dart';
 import 'package:test/test.dart';
 import 'dart:io';
+import 'package:diff_match_patch/diff_match_patch.dart';
 
 String snapshot() {
   String contents = '';
@@ -46,7 +47,13 @@ void main() {
     var file = File('unrefactoredSnapshot.txt');
     try {
       String contents = await file.readAsString();
-      expect(contents, snapshot());
+      var wFile = File('refactoredSnapshot.txt');
+      // Write the text to the file asynchronously
+      await wFile.writeAsString(snapshot());
+      if ((contents == snapshot()) == false) {
+          print(diff(contents, snapshot()).toString());
+      }
+      expect(contents == snapshot(), true); // just to do not print long string in the output
     } catch (e) {
       fail(e.toString());
     }
